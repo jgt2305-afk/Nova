@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050a12">
+  <title>Games · Nova</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body class="games-page">
+  <main class="games-shell">
+    <header class="games-header">
+      <a class="games-brand" href="/" aria-label="Nova Games"><span>✳</span> NOVA <i>/</i> GAMES</a>
+      <div class="games-count" id="games-count">Loading games…</div>
+    </header>
+    <section class="games-intro">
+      <p class="games-kicker">YOUR OFFLINE LIBRARY</p>
+      <h1>Games<span>.</span></h1>
+      <p class="games-subtitle">Pick a game and jump right in.</p>
+      <label class="games-search"><span aria-hidden="true">⌕</span><input id="games-search" type="search" placeholder="Find a game…" autocomplete="off" aria-label="Find a game"></label>
+    </section>
+    <section class="games-library" aria-label="Offline games">
+      <div class="games-grid" id="games-grid" aria-live="polite"></div>
+      <p class="games-empty" id="games-empty" hidden>No games match that search.</p>
+      <p class="games-load-error" id="games-load-error" hidden>Nova could not load the offline games list. Restart Nova and try again.</p>
+    </section>
+    <footer class="games-footer">✳ <span>Nova Games</span> · Stored in this project’s offline folder</footer>
+  </main>
+  <script src="/games.js" defer></script>
+</body>
+</html>

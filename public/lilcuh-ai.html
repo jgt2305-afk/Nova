@@ -1,0 +1,1233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lil Cuh Stocks</title>
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #07100d;
+  --panel: #101915;
+  --panel-2: #16221d;
+  --line: #274237;
+  --text: #edf7f1;
+  --muted: #92a79c;
+  --green: #4fe08a;
+  --red: #ff6575;
+  --gold: #ffd166;
+  --blue: #62b6ff;
+  --ink: #07100d;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(79, 224, 138, 0.08), transparent 35%),
+    linear-gradient(315deg, rgba(98, 182, 255, 0.07), transparent 35%),
+    var(--bg);
+  color: var(--text);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+button, input, select, textarea {
+  font: inherit;
+}
+
+button {
+  border: 1px solid var(--line);
+  background: #182720;
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.16s ease, background 0.16s ease, transform 0.16s ease;
+}
+
+button:hover {
+  border-color: #3f705c;
+  background: #20382d;
+  transform: translateY(-1px);
+}
+
+.shell {
+  width: min(1500px, 96vw);
+  height: min(930px, 94vh);
+  margin: 3vh auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 390px;
+  gap: 16px;
+}
+
+.market, .chat-panel {
+  min-height: 0;
+  border: 1px solid var(--line);
+  background: rgba(16, 25, 21, 0.94);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+}
+
+.market {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  gap: 14px;
+  padding: 18px;
+  border-radius: 10px;
+}
+
+.chat-panel {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.top-row, .stat-grid, .control-row, .brain-grid, .position-grid {
+  display: grid;
+  gap: 10px;
+}
+
+.top-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+}
+
+.title h1 {
+  margin: 0;
+  font-size: clamp(1.7rem, 3vw, 2.65rem);
+  letter-spacing: 0;
+}
+
+.title p {
+  margin: 7px 0 0;
+  color: var(--muted);
+  max-width: 720px;
+  line-height: 1.45;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 11px;
+  border: 1px solid #335849;
+  border-radius: 8px;
+  color: #c9f5dc;
+  background: #13231b;
+  white-space: nowrap;
+}
+
+.pulse {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 18px rgba(79, 224, 138, 0.85);
+}
+
+.stat-grid {
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+}
+
+.stat, .brain-card, .ledger, .chart-wrap, .control-card {
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.01));
+  border-radius: 8px;
+}
+
+.stat {
+  padding: 12px;
+  min-width: 0;
+}
+
+.label {
+  color: var(--muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.value {
+  margin-top: 7px;
+  font-size: 1.45rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.green { color: var(--green); }
+.red { color: var(--red); }
+.gold { color: var(--gold); }
+.blue { color: var(--blue); }
+
+.chart-wrap {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
+  overflow: hidden;
+}
+
+canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    #0a1410;
+  background-size: 48px 48px;
+}
+
+.ticker-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  border-top: 1px solid var(--line);
+}
+
+.ticker {
+  padding: 11px 12px;
+  border-right: 1px solid var(--line);
+  min-width: 0;
+}
+
+.ticker:last-child { border-right: none; }
+.ticker strong { display: block; }
+.ticker span { color: var(--muted); font-size: 0.86rem; }
+
+.brain-grid {
+  grid-template-columns: 1.1fr 0.9fr;
+  min-height: 190px;
+}
+
+.brain-card, .ledger, .control-card {
+  padding: 13px;
+  min-width: 0;
+}
+
+.decision {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 11px;
+}
+
+.decision-word {
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: var(--gold);
+  color: var(--ink);
+  font-weight: 900;
+  min-width: 86px;
+  text-align: center;
+}
+
+.reason {
+  color: #cfe0d6;
+  line-height: 1.42;
+}
+
+.meter {
+  height: 9px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: #0b120f;
+  border: 1px solid var(--line);
+  margin-top: 10px;
+}
+
+.meter div {
+  height: 100%;
+  width: 50%;
+  background: linear-gradient(90deg, var(--red), var(--gold), var(--green));
+}
+
+.position-grid {
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 12px;
+}
+
+.mini {
+  padding: 9px;
+  border: 1px solid rgba(39, 66, 55, 0.78);
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.mini div:last-child {
+  margin-top: 5px;
+  font-weight: 800;
+}
+
+.ledger-list {
+  height: 132px;
+  overflow: auto;
+  margin-top: 10px;
+  padding-right: 4px;
+}
+
+.ledger-item {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr) auto;
+  gap: 8px;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(39, 66, 55, 0.65);
+  font-size: 0.88rem;
+}
+
+.control-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.training-card { margin-top: 12px; padding: 14px; }
+.training-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.training-heading h2 { margin: 5px 0 4px; font-size: 1.05rem; }
+.training-heading p,.training-status,.training-progress-text { margin: 0; color: var(--muted); font-size: .85rem; line-height: 1.45; }
+.training-status { max-width: 46%; text-align: right; color: var(--blue); }
+.training-controls { display: flex; align-items: end; gap: 9px; flex-wrap: wrap; margin-top: 13px; }
+.training-controls label { display: grid; gap: 5px; color: var(--muted); font-size: .76rem; }
+.training-controls select,.training-controls button { height: 38px; padding: 0 11px; }
+.training-controls button:first-of-type { background: var(--green); color: var(--ink); border-color: transparent; font-weight: 800; }
+.training-card progress { display: block; width: 100%; height: 8px; margin: 13px 0 6px; accent-color: var(--green); }
+.training-progress-text { font-size: .76rem; }
+
+.error-banner {
+  display: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 11px 12px;
+  border: 1px solid rgba(255, 101, 117, 0.62);
+  border-radius: 8px;
+  background: rgba(255, 101, 117, 0.12);
+  color: #ffd8dc;
+}
+
+.error-banner.visible {
+  display: flex;
+}
+
+.error-banner button {
+  flex: 0 0 auto;
+  padding: 8px 10px;
+  background: #35181b;
+  border-color: rgba(255, 101, 117, 0.75);
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.controls button, .controls select {
+  height: 40px;
+  padding: 0 12px;
+}
+
+select {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #101b16;
+  color: var(--text);
+}
+
+.chat-head {
+  padding: 16px;
+  border-bottom: 1px solid var(--line);
+}
+
+.chat-head h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.chat-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  line-height: 1.4;
+  font-size: 0.92rem;
+}
+
+.messages {
+  min-height: 0;
+  overflow: auto;
+  padding: 14px;
+}
+
+.message {
+  width: fit-content;
+  max-width: 100%;
+  padding: 11px 12px;
+  margin-bottom: 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  line-height: 1.42;
+  white-space: pre-wrap;
+}
+
+.message.ai {
+  background: #121f19;
+  color: #def2e6;
+}
+
+.message.user {
+  margin-left: auto;
+  background: #193026;
+}
+
+.quick-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.quick-row button {
+  padding: 7px 9px;
+  font-size: 0.86rem;
+}
+
+.chat-input {
+  padding: 12px;
+  border-top: 1px solid var(--line);
+}
+
+textarea {
+  width: 100%;
+  height: 86px;
+  resize: none;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #0e1814;
+  color: var(--text);
+  padding: 11px;
+  outline: none;
+}
+
+.send-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 92px;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.send-row button {
+  font-weight: 800;
+  background: var(--green);
+  color: var(--ink);
+  border-color: transparent;
+}
+
+@media (max-width: 1100px) {
+  body { overflow: auto; }
+  .shell {
+    height: auto;
+    grid-template-columns: 1fr;
+    margin: 12px auto;
+  }
+  .market { min-height: 820px; }
+  .chat-panel { min-height: 620px; }
+}
+
+@media (max-width: 720px) {
+  .shell { width: 100%; margin: 0; }
+  .market, .chat-panel { border-radius: 0; }
+  .top-row, .brain-grid, .control-row { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+  .ticker-strip { grid-template-columns: repeat(2, 1fr); }
+  .value { font-size: 1.18rem; }
+  .training-heading { display: block; }
+  .training-status { max-width: none; margin-top: 8px; text-align: left; }
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <main class="market">
+    <section class="top-row">
+      <div class="title">
+        <h1>Lil Cuh Stocks</h1>
+        <p>A practice trading lab with fake prices, risk controls, and a reasoning engine that explains every move. Simulated only, not financial advice.</p>
+      </div>
+      <div class="badge"><span class="pulse"></span><span id="runState">Market running</span></div>
+    </section>
+
+    <section class="stat-grid">
+      <div class="stat"><div class="label">Fake Symbol</div><div class="value" id="symbol">LCUH</div></div>
+      <div class="stat"><div class="label">Price</div><div class="value" id="price">$100.00</div></div>
+      <div class="stat"><div class="label">Portfolio</div><div class="value" id="portfolio">$10,000</div></div>
+      <div class="stat"><div class="label">Unrealized P/L</div><div class="value" id="pnl">$0</div></div>
+      <div class="stat"><div class="label">Risk Mode</div><div class="value" id="riskMode">Balanced</div></div>
+    </section>
+
+    <section class="chart-wrap">
+      <canvas id="chart" width="1100" height="560" aria-label="Fake stock chart"></canvas>
+      <div class="ticker-strip" id="tickerStrip"></div>
+    </section>
+
+    <section class="brain-grid">
+      <div class="brain-card">
+        <div class="label">AI Decision Engine</div>
+        <div class="decision">
+          <div class="decision-word" id="decisionWord">HOLD</div>
+          <div class="reason" id="decisionReason">Waiting for enough fake candles to estimate trend, momentum, and risk.</div>
+        </div>
+        <div class="meter"><div id="confidenceMeter"></div></div>
+        <div class="position-grid">
+          <div class="mini"><span class="label">Shares</span><div id="shares">0</div></div>
+          <div class="mini"><span class="label">Cash</span><div id="cash">$10,000</div></div>
+          <div class="mini"><span class="label">Avg Entry</span><div id="avgEntry">-</div></div>
+          <div class="mini"><span class="label">Stop Logic</span><div id="stopLogic">Armed after entry</div></div>
+        </div>
+      </div>
+      <div class="ledger">
+        <div class="label">Trade Ledger</div>
+        <div class="ledger-list" id="ledger"></div>
+      </div>
+    </section>
+
+    <section class="control-row">
+      <div class="control-card">
+        <div class="label">Market Pattern</div>
+        <div class="controls" style="margin-top:10px;">
+          <select id="patternSelect">
+            <option value="random">Random regime</option>
+            <option value="trend">Trend climb</option>
+            <option value="selloff">Sharp selloff</option>
+            <option value="chop">Sideways chop</option>
+            <option value="breakout">Breakout fakeout</option>
+          </select>
+          <select id="riskSelect">
+            <option value="balanced">Balanced risk</option>
+            <option value="careful">Careful risk</option>
+            <option value="bold">Bold risk</option>
+          </select>
+          <button id="pauseBtn">Pause</button>
+          <button id="stepBtn">Step</button>
+          <button id="resetBtn">Reset</button>
+          <button id="testErrorBtn">Test error</button>
+        </div>
+        <div id="errorBanner" class="error-banner">
+          <span id="errorText">AI error detected.</span>
+          <button id="cancelErrorBtn">Cancel</button>
+        </div>
+      </div>
+      <div class="controls">
+        <button id="askWhyBtn">Ask why</button>
+        <button id="stressBtn">Stress test</button>
+      </div>
+    </section>
+
+    <section class="control-card training-card" aria-labelledby="trainingTitle">
+      <div class="training-heading">
+        <div>
+          <div class="label">LOCAL MODEL TRAINING</div>
+          <h2 id="trainingTitle">Train Lil Cuh</h2>
+          <p>Q-learning on generated fake price paths. The learned policy stays in this browser.</p>
+        </div>
+        <p class="training-status" id="modelStatus">No trained model saved yet. The simulator is using its starter policy.</p>
+      </div>
+      <div class="training-controls">
+        <label for="trainingEpisodes">Training episodes
+          <select id="trainingEpisodes">
+            <option value="100">100</option>
+            <option value="500" selected>500</option>
+            <option value="1000">1,000</option>
+          </select>
+        </label>
+        <button id="trainModelBtn" type="button">Train AI</button>
+        <button id="resetModelBtn" type="button">Clear learned model</button>
+      </div>
+      <progress id="trainingProgress" max="100" value="0" aria-label="Training progress"></progress>
+      <p class="training-progress-text" id="trainingProgressText">Training uses simulated markets only; it does not place trades or connect to a brokerage.</p>
+    </section>
+  </main>
+
+  <aside class="chat-panel">
+    <div class="chat-head">
+      <h2>AI Stock Chat</h2>
+      <p>Ask about the current setup, fake trades, risk, indicators, or what the bot would do next.</p>
+      <div class="quick-row">
+        <button data-prompt="What are you seeing right now?">Read setup</button>
+        <button data-prompt="Should we buy, sell, or wait?">Decision</button>
+        <button data-prompt="Explain the risk like I am new.">Risk</button>
+      </div>
+    </div>
+    <div class="messages" id="messages"></div>
+    <div class="chat-input">
+      <textarea id="chatInput" placeholder="Ask the stock AI..."></textarea>
+      <div class="send-row">
+        <select id="toneSelect">
+          <option value="coach">Coach</option>
+          <option value="analyst">Analyst</option>
+          <option value="simple">Simple</option>
+        </select>
+        <button id="sendBtn">Send</button>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+const chart = document.getElementById('chart');
+const ctx = chart.getContext('2d');
+const els = {
+  runState: document.getElementById('runState'),
+  price: document.getElementById('price'),
+  portfolio: document.getElementById('portfolio'),
+  pnl: document.getElementById('pnl'),
+  riskMode: document.getElementById('riskMode'),
+  decisionWord: document.getElementById('decisionWord'),
+  decisionReason: document.getElementById('decisionReason'),
+  confidenceMeter: document.getElementById('confidenceMeter'),
+  shares: document.getElementById('shares'),
+  cash: document.getElementById('cash'),
+  avgEntry: document.getElementById('avgEntry'),
+  stopLogic: document.getElementById('stopLogic'),
+  errorBanner: document.getElementById('errorBanner'),
+  errorText: document.getElementById('errorText'),
+  ledger: document.getElementById('ledger'),
+  tickerStrip: document.getElementById('tickerStrip'),
+  messages: document.getElementById('messages'),
+  chatInput: document.getElementById('chatInput'),
+  modelStatus: document.getElementById('modelStatus'),
+  trainingProgress: document.getElementById('trainingProgress'),
+  trainingProgressText: document.getElementById('trainingProgressText')
+};
+
+const MODEL_STORAGE_KEY = 'lilcuh-stock-q-learning-v1';
+function loadModel() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(MODEL_STORAGE_KEY) || '{}');
+    const qTable = saved.qTable && typeof saved.qTable === 'object' ? saved.qTable : {};
+    return {
+      qTable,
+      trainedEpisodes: Number.isFinite(saved.trainedEpisodes) ? saved.trainedEpisodes : 0,
+      lastAverageReturn: Number.isFinite(saved.lastAverageReturn) ? saved.lastAverageReturn : null,
+    };
+  } catch {
+    return { qTable: {}, trainedEpisodes: 0, lastAverageReturn: null };
+  }
+}
+const savedModel = loadModel();
+
+const state = {
+  symbol: 'LCUH',
+  price: 100,
+  cash: 10000,
+  shares: 0,
+  avgEntry: 0,
+  tick: 0,
+  running: true,
+  pattern: 'random',
+  risk: 'balanced',
+  emergencyError: null,
+  candles: [],
+  trades: [],
+  lastDecision: null,
+  qTable: savedModel.qTable,
+  trainedEpisodes: savedModel.trainedEpisodes,
+  lastAverageReturn: savedModel.lastAverageReturn,
+  companion: [
+    { symbol: 'RABT', price: 48, drift: 0.03 },
+    { symbol: 'HAT', price: 132, drift: -0.02 },
+    { symbol: 'BYTE', price: 74, drift: 0.01 },
+    { symbol: 'NOVA', price: 215, drift: 0.04 }
+  ]
+};
+
+const riskProfiles = {
+  careful: { maxAllocation: 0.22, stopLoss: 0.035, takeProfit: 0.07, confidenceToBuy: 66, confidenceToSell: 58 },
+  balanced: { maxAllocation: 0.34, stopLoss: 0.052, takeProfit: 0.095, confidenceToBuy: 61, confidenceToSell: 55 },
+  bold: { maxAllocation: 0.48, stopLoss: 0.075, takeProfit: 0.13, confidenceToBuy: 56, confidenceToSell: 52 }
+};
+
+function money(value) {
+  return value.toLocaleString(undefined, { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function average(values) {
+  if (!values.length) return 0;
+  return values.reduce((sum, value) => sum + value, 0) / values.length;
+}
+
+function ema(values, period) {
+  if (!values.length) return 0;
+  const k = 2 / (period + 1);
+  return values.reduce((prev, value, index) => index === 0 ? value : value * k + prev * (1 - k), values[0]);
+}
+
+function rsi(values, period = 14) {
+  if (values.length < period + 1) return 50;
+  const slice = values.slice(-period - 1);
+  let gains = 0;
+  let losses = 0;
+  for (let i = 1; i < slice.length; i++) {
+    const change = slice[i] - slice[i - 1];
+    if (change >= 0) gains += change;
+    else losses -= change;
+  }
+  if (losses === 0) return 100;
+  const rs = gains / losses;
+  return 100 - (100 / (1 + rs));
+}
+
+function volatility(values, period = 20) {
+  if (values.length < 3) return 0;
+  const returns = values.slice(-period).map((value, index, arr) => index === 0 ? 0 : (value - arr[index - 1]) / arr[index - 1]).slice(1);
+  const mean = average(returns);
+  return Math.sqrt(average(returns.map(value => Math.pow(value - mean, 2))));
+}
+
+function policyStateKey(prices, index, holding) {
+  const current = prices[index];
+  const short = average(prices.slice(Math.max(0, index - 7), index + 1));
+  const long = average(prices.slice(Math.max(0, index - 20), index + 1));
+  const prior = prices[Math.max(0, index - 5)] || current;
+  const momentum = prior ? ((current - prior) / prior) * 100 : 0;
+  const strength = rsi(prices.slice(0, index + 1));
+  const trendBand = short >= long ? 'up' : 'down';
+  const momentumBand = momentum < -0.35 ? 'down' : momentum > 0.35 ? 'up' : 'flat';
+  const rsiBand = strength < 38 ? 'low' : strength > 68 ? 'high' : 'mid';
+  return `${trendBand}:${momentumBand}:${rsiBand}:${holding ? 'in' : 'out'}`;
+}
+
+function qValues(key) {
+  if (!Array.isArray(state.qTable[key]) || state.qTable[key].length !== 3) state.qTable[key] = [0, 0, 0];
+  return state.qTable[key];
+}
+
+function trainedChoice(prices, index, holding) {
+  if (!state.trainedEpisodes) return null;
+  const values = state.qTable[policyStateKey(prices, index, holding)];
+  if (!Array.isArray(values)) return null;
+  const actions = holding ? [0, 2] : [0, 1];
+  const ranked = [...actions].sort((a, b) => values[b] - values[a]);
+  return { action: ['HOLD', 'BUY', 'SELL'][ranked[0]], gap: values[ranked[0]] - values[ranked[1]] };
+}
+
+function createTrainingPrices() {
+  const regimes = ['random', 'trend', 'selloff', 'chop', 'breakout'];
+  const offset = Math.floor(Math.random() * regimes.length);
+  const prices = [100];
+  for (let i = 1; i < 241; i++) {
+    const regime = regimes[(Math.floor(i / 48) + offset) % regimes.length];
+    let drift = 0;
+    if (regime === 'random') drift = (Math.random() - 0.52) * 0.16;
+    if (regime === 'trend') drift = 0.09;
+    if (regime === 'selloff') drift = -0.11;
+    if (regime === 'chop') drift = Math.sin(i / 2.5) * 0.12;
+    if (regime === 'breakout') drift = i % 48 < 34 ? 0.12 : -0.2;
+    const noise = (Math.random() - 0.5) * 0.72;
+    prices.push(clamp(prices.at(-1) * (1 + (drift + noise) / 100), 18, 520));
+  }
+  return prices;
+}
+
+function trainEpisode(epsilon) {
+  const prices = createTrainingPrices();
+  let cash = 10000;
+  let shares = 0;
+  let episodeReward = 0;
+  for (let i = 20; i < prices.length - 1; i++) {
+    const price = prices[i];
+    const key = policyStateKey(prices, i, shares > 0);
+    const values = qValues(key);
+    const validActions = shares > 0 ? [0, 2] : [0, 1];
+    let action;
+    if (Math.random() < epsilon) action = validActions[Math.floor(Math.random() * validActions.length)];
+    else action = validActions.reduce((best, item) => values[item] > values[best] ? item : best, validActions[0]);
+
+    const equityBefore = cash + shares * price;
+    let transactionCost = 0;
+    if (action === 1 && shares === 0) {
+      shares = Math.floor(cash * 0.25 / price);
+      const cost = shares * price;
+      cash -= cost;
+      transactionCost = cost > 0 ? 0.02 : 0;
+    } else if (action === 2 && shares > 0) {
+      cash += shares * price;
+      shares = 0;
+      transactionCost = 0.02;
+    }
+
+    const nextPrice = prices[i + 1];
+    const reward = (cash + shares * nextPrice - equityBefore) / 100 - transactionCost;
+    episodeReward += reward;
+    const nextKey = policyStateKey(prices, i + 1, shares > 0);
+    const nextValues = qValues(nextKey);
+    const nextActions = shares > 0 ? [0, 2] : [0, 1];
+    const bestNext = Math.max(...nextActions.map(item => nextValues[item]));
+    values[action] += 0.12 * (reward + 0.94 * bestNext - values[action]);
+  }
+  const finalEquity = cash + shares * prices.at(-1);
+  return { percentReturn: (finalEquity - 10000) / 100, reward: episodeReward };
+}
+
+function saveModel() {
+  try {
+    localStorage.setItem(MODEL_STORAGE_KEY, JSON.stringify({
+      qTable: state.qTable,
+      trainedEpisodes: state.trainedEpisodes,
+      lastAverageReturn: state.lastAverageReturn,
+    }));
+  } catch (error) {
+    console.warn('Could not save Lil Cuh training model:', error);
+  }
+}
+
+function updateModelStatus() {
+  if (!state.trainedEpisodes) {
+    els.modelStatus.textContent = 'No trained model saved yet. The simulator is using its starter policy.';
+    return;
+  }
+  const avg = Number.isFinite(state.lastAverageReturn) ? ` Last batch average fake return: ${state.lastAverageReturn.toFixed(2)}%.` : '';
+  els.modelStatus.textContent = `Learned policy saved in this browser · ${state.trainedEpisodes.toLocaleString()} episodes.${avg}`;
+}
+
+async function trainModel() {
+  const button = document.getElementById('trainModelBtn');
+  const modelReset = document.getElementById('resetModelBtn');
+  const lockedControls = ['pauseBtn', 'stepBtn', 'resetBtn'].map(id => document.getElementById(id));
+  const episodes = clamp(Number(document.getElementById('trainingEpisodes').value) || 100, 1, 1000);
+  const wasRunning = state.running;
+  state.running = false;
+  els.runState.textContent = 'Training model';
+  button.disabled = true;
+  modelReset.disabled = true;
+  lockedControls.forEach(control => control.disabled = true);
+  button.textContent = 'Training…';
+  els.trainingProgress.value = 0;
+  let totalReturn = 0;
+  const yieldEvery = Math.max(5, Math.floor(episodes / 50));
+  try {
+    for (let episode = 0; episode < episodes; episode++) {
+      const epsilon = Math.max(0.04, 0.32 * (1 - episode / episodes));
+      totalReturn += trainEpisode(epsilon).percentReturn;
+      if ((episode + 1) % yieldEvery === 0 || episode + 1 === episodes) {
+        const progress = Math.round((episode + 1) / episodes * 100);
+        els.trainingProgress.value = progress;
+        els.trainingProgressText.textContent = `Training episode ${(episode + 1).toLocaleString()} of ${episodes.toLocaleString()} · exploring fake trend, selloff, chop, and breakout paths.`;
+        await new Promise(resolve => setTimeout(resolve, 0));
+      }
+    }
+    state.trainedEpisodes += episodes;
+    state.lastAverageReturn = totalReturn / episodes;
+    saveModel();
+    updateModelStatus();
+    addAiMessage(`Training finished on ${episodes.toLocaleString()} generated fake-market episodes. I updated my local Q-learning policy; its average simulated return this batch was ${state.lastAverageReturn.toFixed(2)}%.`);
+  } catch (error) {
+    els.trainingProgressText.textContent = `Training stopped: ${error.message || String(error)}`;
+    console.error('Lil Cuh training error:', error);
+  } finally {
+    state.running = wasRunning;
+    els.runState.textContent = state.running ? 'Market running' : 'Market paused';
+    document.getElementById('pauseBtn').textContent = state.running ? 'Pause' : 'Resume';
+    button.disabled = false;
+    modelReset.disabled = false;
+    lockedControls.forEach(control => control.disabled = false);
+    button.textContent = 'Train AI';
+    render();
+  }
+}
+
+function nextMove() {
+  const t = state.tick;
+  const noise = (Math.random() - 0.5) * 1.15;
+  let drift = 0;
+  if (state.pattern === 'random') drift = Math.sin(t / 17) * 0.18 + (Math.random() - 0.48) * 0.28;
+  if (state.pattern === 'trend') drift = 0.24 + Math.sin(t / 12) * 0.12;
+  if (state.pattern === 'selloff') drift = -0.28 + Math.sin(t / 10) * 0.16;
+  if (state.pattern === 'chop') drift = Math.sin(t / 3) * 0.38;
+  if (state.pattern === 'breakout') drift = t % 70 < 45 ? 0.2 : -0.55;
+  return drift + noise;
+}
+
+function makeCandle() {
+  const open = state.price;
+  const move = nextMove();
+  const close = clamp(open + move, 8, 400);
+  const high = Math.max(open, close) + Math.random() * 0.9;
+  const low = Math.min(open, close) - Math.random() * 0.9;
+  const volume = Math.round(95000 + Math.abs(move) * 120000 + Math.random() * 85000);
+  state.price = close;
+  state.tick += 1;
+  state.candles.push({ open, high, low, close, volume, tick: state.tick });
+  if (state.candles.length > 180) state.candles.shift();
+  state.companion.forEach(item => {
+    item.price = clamp(item.price + item.drift + (Math.random() - 0.5) * 1.4, 5, 500);
+  });
+}
+
+function analyzeMarket() {
+  const closes = state.candles.map(candle => candle.close);
+  const shortEma = ema(closes.slice(-18), 8);
+  const longEma = ema(closes.slice(-45), 21);
+  const momentum = closes.length > 10 ? ((closes.at(-1) - closes.at(-10)) / closes.at(-10)) * 100 : 0;
+  const strength = rsi(closes);
+  const vol = volatility(closes) * 100;
+  const trendScore = clamp((shortEma - longEma) * 5, -25, 25);
+  const momentumScore = clamp(momentum * 3.5, -24, 24);
+  const rsiScore = strength < 34 ? 16 : strength > 72 ? -17 : (strength - 50) * 0.45;
+  const volPenalty = vol > 1.7 ? -10 : vol < 0.55 ? 4 : 0;
+  const positionRisk = state.shares > 0 && state.avgEntry ? ((state.price - state.avgEntry) / state.avgEntry) * 100 : 0;
+  let confidence = clamp(50 + trendScore + momentumScore + rsiScore + volPenalty, 5, 96);
+  const profile = riskProfiles[state.risk];
+  const learned = trainedChoice(closes, closes.length - 1, state.shares > 0);
+  let action = 'HOLD';
+  let reason = 'Signals are mixed, so patience has better odds than forcing a trade.';
+
+  if (state.shares > 0 && positionRisk <= -profile.stopLoss * 100) {
+    action = 'SELL';
+    reason = 'Stop loss triggered. The bot protects cash when the fake trade moves too far against entry.';
+  } else if (state.shares > 0 && positionRisk >= profile.takeProfit * 100 && strength > 68) {
+    action = 'SELL';
+    reason = 'Profit target area reached while RSI is hot. The bot locks gains instead of chasing.';
+  } else if (learned) {
+    action = learned.action;
+    confidence = clamp(52 + learned.gap * 300, 5, 96);
+    reason = `The locally trained policy chose ${action} from its learned action values for this trend, momentum, RSI, and position state.`;
+  } else if (confidence >= profile.confidenceToBuy && state.shares === 0 && strength < 76) {
+    action = 'BUY';
+    reason = 'Short trend is above long trend, momentum supports the move, and risk is still acceptable.';
+  } else if (state.shares > 0 && confidence <= profile.confidenceToSell) {
+    action = 'SELL';
+    reason = 'Confidence faded below the exit line. The bot steps out before weakness gets expensive.';
+  } else if (state.shares > 0) {
+    action = 'HOLD';
+    reason = 'Already in the trade. Trend has not broken the exit rules yet.';
+  }
+
+  return { action, reason, confidence, shortEma, longEma, momentum, rsi: strength, vol, positionRisk };
+}
+
+function detectMarketError(decision) {
+  const candles = state.candles;
+  const latest = candles.at(-1);
+  const previous = candles.at(-2);
+  if (!latest || !Number.isFinite(latest.close) || latest.close <= 0) {
+    return 'Bad price feed: latest fake price is invalid.';
+  }
+  if (!previous) return null;
+
+  const oneTickMove = ((latest.close - previous.close) / previous.close) * 100;
+  if (Math.abs(oneTickMove) >= 4.5) {
+    return `AI detected a price-feed shock: ${oneTickMove.toFixed(2)}% in one tick.`;
+  }
+  if (state.shares > 0 && decision.vol >= 3.2 && decision.confidence < 45) {
+    return 'AI detected unstable volatility while holding a position.';
+  }
+  if (state.shares > 0 && decision.positionRisk <= -12) {
+    return 'AI detected emergency drawdown beyond normal stop rules.';
+  }
+  return null;
+}
+
+function triggerEmergencySell(message) {
+  if (state.emergencyError) return;
+  state.emergencyError = message;
+  if (state.shares > 0) {
+    const quantity = state.shares;
+    state.cash += quantity * state.price;
+    state.shares = 0;
+    state.avgEntry = 0;
+    logTrade('ERROR SELL', quantity, state.price, 100);
+  }
+  state.running = false;
+  document.getElementById('pauseBtn').textContent = 'Resume';
+  els.runState.textContent = 'Emergency paused';
+  addAiMessage(`${message}\n\nEmergency safety fired. I immediately sold the fake stock and paused auto-trading.`);
+}
+
+function clearEmergencyError() {
+  state.emergencyError = null;
+  els.errorBanner.classList.remove('visible');
+  els.errorText.textContent = 'AI error detected.';
+  els.runState.textContent = state.running ? 'Market running' : 'Market paused';
+  addAiMessage('Emergency error canceled. Auto-trading stays paused until you press Resume.');
+}
+
+function executeDecision(decision) {
+  const profile = riskProfiles[state.risk];
+  if (decision.action === 'BUY' && state.shares === 0) {
+    const allocation = state.cash * profile.maxAllocation;
+    const quantity = Math.max(1, Math.floor(allocation / state.price));
+    const cost = quantity * state.price;
+    if (cost <= state.cash) {
+      state.cash -= cost;
+      state.shares = quantity;
+      state.avgEntry = state.price;
+      logTrade('BUY', quantity, state.price, decision.confidence);
+    }
+  }
+
+  if (decision.action === 'SELL' && state.shares > 0) {
+    const quantity = state.shares;
+    state.cash += quantity * state.price;
+    state.shares = 0;
+    state.avgEntry = 0;
+    logTrade('SELL', quantity, state.price, decision.confidence);
+  }
+}
+
+function logTrade(side, quantity, price, confidence) {
+  state.trades.unshift({ side, quantity, price, confidence, tick: state.tick });
+  state.trades = state.trades.slice(0, 16);
+}
+
+function drawChart() {
+  const rect = chart.getBoundingClientRect();
+  const scale = window.devicePixelRatio || 1;
+  chart.width = Math.floor(rect.width * scale);
+  chart.height = Math.floor(rect.height * scale);
+  ctx.setTransform(scale, 0, 0, scale, 0, 0);
+  const width = rect.width;
+  const height = rect.height;
+  ctx.clearRect(0, 0, width, height);
+
+  const candles = state.candles;
+  if (!candles.length) return;
+  const pad = 28;
+  const highs = candles.map(candle => candle.high);
+  const lows = candles.map(candle => candle.low);
+  const max = Math.max(...highs);
+  const min = Math.min(...lows);
+  const range = Math.max(1, max - min);
+  const candleWidth = Math.max(4, (width - pad * 2) / candles.length);
+
+  function y(price) {
+    return pad + (max - price) / range * (height - pad * 2);
+  }
+
+  ctx.strokeStyle = 'rgba(237,247,241,0.08)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 5; i++) {
+    const yy = pad + i * (height - pad * 2) / 4;
+    ctx.beginPath();
+    ctx.moveTo(pad, yy);
+    ctx.lineTo(width - pad, yy);
+    ctx.stroke();
+  }
+
+  candles.forEach((candle, index) => {
+    const x = pad + index * candleWidth + candleWidth / 2;
+    const up = candle.close >= candle.open;
+    ctx.strokeStyle = up ? '#4fe08a' : '#ff6575';
+    ctx.fillStyle = up ? '#4fe08a' : '#ff6575';
+    ctx.beginPath();
+    ctx.moveTo(x, y(candle.high));
+    ctx.lineTo(x, y(candle.low));
+    ctx.stroke();
+    const top = y(Math.max(candle.open, candle.close));
+    const bottom = y(Math.min(candle.open, candle.close));
+    ctx.fillRect(x - candleWidth * 0.28, top, candleWidth * 0.56, Math.max(2, bottom - top));
+  });
+
+  const closes = candles.map(candle => candle.close);
+  drawLine(closes.map((_, i) => ema(closes.slice(0, i + 1), 8)), '#62b6ff', y, candleWidth, pad);
+  drawLine(closes.map((_, i) => ema(closes.slice(0, i + 1), 21)), '#ffd166', y, candleWidth, pad);
+}
+
+function drawLine(values, color, y, candleWidth, pad) {
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  values.forEach((value, index) => {
+    const x = pad + index * candleWidth + candleWidth / 2;
+    if (index === 0) ctx.moveTo(x, y(value));
+    else ctx.lineTo(x, y(value));
+  });
+  ctx.stroke();
+}
+
+function render() {
+  const decision = analyzeMarket();
+  state.lastDecision = decision;
+  const error = state.emergencyError || detectMarketError(decision);
+  if (error) {
+    if (!state.emergencyError) triggerEmergencySell(error);
+    decision.action = 'ERROR';
+    decision.reason = 'Emergency protection is active. The bot sold immediately and paused trading.';
+    decision.confidence = 100;
+  } else {
+    executeDecision(decision);
+  }
+  const portfolio = state.cash + state.shares * state.price;
+  const unrealized = state.shares ? (state.price - state.avgEntry) * state.shares : 0;
+
+  els.price.textContent = money(state.price);
+  els.portfolio.textContent = money(portfolio);
+  els.pnl.textContent = money(unrealized);
+  els.pnl.className = `value ${unrealized >= 0 ? 'green' : 'red'}`;
+  els.riskMode.textContent = state.risk[0].toUpperCase() + state.risk.slice(1);
+  els.decisionWord.textContent = decision.action;
+  els.decisionWord.style.background = decision.action === 'BUY' ? 'var(--green)' : decision.action === 'SELL' || decision.action === 'ERROR' ? 'var(--red)' : 'var(--gold)';
+  els.decisionReason.textContent = decision.reason;
+  els.confidenceMeter.style.width = `${decision.confidence}%`;
+  els.shares.textContent = state.shares;
+  els.cash.textContent = money(state.cash);
+  els.avgEntry.textContent = state.avgEntry ? money(state.avgEntry) : '-';
+  els.stopLogic.textContent = state.avgEntry ? `${money(state.avgEntry * (1 - riskProfiles[state.risk].stopLoss))}` : 'Armed after entry';
+  els.errorBanner.classList.toggle('visible', Boolean(state.emergencyError));
+  els.errorText.textContent = state.emergencyError || 'AI error detected.';
+  updateModelStatus();
+
+  els.ledger.innerHTML = state.trades.length
+    ? state.trades.map(trade => `<div class="ledger-item"><strong class="${trade.side === 'BUY' ? 'green' : 'red'}">${trade.side}</strong><span>${trade.quantity} @ ${money(trade.price)}</span><span>${Math.round(trade.confidence)}%</span></div>`).join('')
+    : '<div class="message ai">No trades yet. The bot is waiting for a clean fake setup.</div>';
+
+  els.tickerStrip.innerHTML = state.companion.map(item => {
+    const move = item.drift + (Math.random() - 0.5) * 0.2;
+    return `<div class="ticker"><strong>${item.symbol} <span class="${move >= 0 ? 'green' : 'red'}">${move >= 0 ? '+' : ''}${move.toFixed(2)}%</span></strong><span>${money(item.price)}</span></div>`;
+  }).join('');
+
+  drawChart();
+}
+
+function stepMarket() {
+  makeCandle();
+  render();
+}
+
+function reset() {
+  state.price = 100;
+  state.cash = 10000;
+  state.shares = 0;
+  state.avgEntry = 0;
+  state.tick = 0;
+  state.running = true;
+  state.emergencyError = null;
+  document.getElementById('pauseBtn').textContent = 'Pause';
+  els.runState.textContent = 'Market running';
+  state.candles = [];
+  state.trades = [];
+  for (let i = 0; i < 44; i++) makeCandle();
+  render();
+  addAiMessage('Fresh fake market loaded. I will wait for evidence, size trades by risk, and explain every move.');
+}
+
+function marketLoop() {
+  if (state.running) stepMarket();
+}
+
+function answerQuestion(text) {
+  const d = state.lastDecision || analyzeMarket();
+  const profile = riskProfiles[state.risk];
+  const tone = document.getElementById('toneSelect').value;
+  const base = {
+    coach: 'Here is the move: ',
+    analyst: 'Current model readout: ',
+    simple: 'Simple answer: '
+  }[tone];
+  const lower = text.toLowerCase();
+  let answer = `${base}${d.action}. Confidence is ${Math.round(d.confidence)}%.\n\n${d.reason}\n\nTrend: EMA8 ${money(d.shortEma)} vs EMA21 ${money(d.longEma)}. Momentum: ${d.momentum.toFixed(2)}%. RSI: ${d.rsi.toFixed(0)}. Volatility: ${d.vol.toFixed(2)}%.`;
+
+  if (lower.includes('risk')) {
+    answer = `${base}risk comes first. In ${state.risk} mode I cap fake allocation at ${Math.round(profile.maxAllocation * 100)}%, use a ${Math.round(profile.stopLoss * 1000) / 10}% stop area, and take profit near ${Math.round(profile.takeProfit * 1000) / 10}% when momentum gets stretched.`;
+  }
+  if (lower.includes('buy') || lower.includes('sell') || lower.includes('wait') || lower.includes('decision')) {
+    answer = `${base}${d.action}. I need trend, momentum, and RSI to agree before buying. I sell when the stop hits, profit gets hot, or confidence breaks down. Right now: ${d.reason}`;
+  }
+  if (lower.includes('why') || lower.includes('seeing') || lower.includes('setup')) {
+    answer = `${base}the fake chart is giving ${d.momentum >= 0 ? 'positive' : 'negative'} momentum with RSI at ${d.rsi.toFixed(0)}. Confidence is ${Math.round(d.confidence)}%, so the bot chooses ${d.action} instead of guessing.`;
+  }
+  return `${answer}\n\nThis is a practice simulation with fake stocks, not real investment advice.`;
+}
+
+function addAiMessage(text) {
+  addMessage(text, 'ai');
+}
+
+function addMessage(text, type) {
+  const node = document.createElement('div');
+  node.className = `message ${type}`;
+  node.textContent = text;
+  els.messages.appendChild(node);
+  els.messages.scrollTop = els.messages.scrollHeight;
+}
+
+function sendChat() {
+  const text = els.chatInput.value.trim();
+  if (!text) return;
+  els.chatInput.value = '';
+  addMessage(text, 'user');
+  addAiMessage(answerQuestion(text));
+}
+
+document.getElementById('pauseBtn').addEventListener('click', event => {
+  if (state.emergencyError) {
+    addAiMessage('Cancel the emergency error first, then press Resume when you are ready.');
+    return;
+  }
+  state.running = !state.running;
+  event.target.textContent = state.running ? 'Pause' : 'Resume';
+  els.runState.textContent = state.running ? 'Market running' : 'Market paused';
+});
+
+document.getElementById('stepBtn').addEventListener('click', stepMarket);
+document.getElementById('resetBtn').addEventListener('click', reset);
+document.getElementById('trainModelBtn').addEventListener('click', trainModel);
+document.getElementById('resetModelBtn').addEventListener('click', () => {
+  state.qTable = {};
+  state.trainedEpisodes = 0;
+  state.lastAverageReturn = null;
+  els.trainingProgress.value = 0;
+  els.trainingProgressText.textContent = 'Learned model cleared. Train again using generated fake markets.';
+  try { localStorage.removeItem(MODEL_STORAGE_KEY); } catch (error) { console.warn('Could not clear saved Lil Cuh model:', error); }
+  render();
+  addAiMessage('I cleared my locally trained policy. I am back on the starter rule-based strategy until you train again.');
+});
+document.getElementById('testErrorBtn').addEventListener('click', () => {
+  triggerEmergencySell('Manual AI error test: simulated decision fault.');
+  render();
+});
+document.getElementById('cancelErrorBtn').addEventListener('click', clearEmergencyError);
+document.getElementById('sendBtn').addEventListener('click', sendChat);
+document.getElementById('askWhyBtn').addEventListener('click', () => addAiMessage(answerQuestion('why')));
+document.getElementById('stressBtn').addEventListener('click', () => {
+  state.pattern = 'selloff';
+  document.getElementById('patternSelect').value = 'selloff';
+  addAiMessage('Stress test switched on. I am watching stops, cash preservation, and whether weakness is controlled or accelerating.');
+});
+
+document.getElementById('patternSelect').addEventListener('change', event => {
+  state.pattern = event.target.value;
+  addAiMessage(`Pattern changed to ${event.target.options[event.target.selectedIndex].text}. I will adapt using the same rules, not hindsight.`);
+});
+
+document.getElementById('riskSelect').addEventListener('change', event => {
+  state.risk = event.target.value;
+  render();
+  addAiMessage(`Risk mode set to ${event.target.options[event.target.selectedIndex].text}. Position sizing and exits updated.`);
+});
+
+document.querySelectorAll('[data-prompt]').forEach(button => {
+  button.addEventListener('click', () => {
+    els.chatInput.value = button.dataset.prompt;
+    sendChat();
+  });
+});
+
+els.chatInput.addEventListener('keydown', event => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendChat();
+  }
+});
+
+window.addEventListener('resize', drawChart);
+
+for (let i = 0; i < 44; i++) makeCandle();
+render();
+addAiMessage('Practice run started. I am reading fake trend, momentum, RSI, volatility, and position risk before making trades.');
+setInterval(marketLoop, 1100);
+</script>
+</body>
+</html>
